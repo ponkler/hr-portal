@@ -1,0 +1,57 @@
+<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light p-0">
+    <div class="container-fluid p-0">
+        <a class="navbar-brand m-2 mx-4" routerLink="/">HR Portal</a>
+        @if (isLoggedIn) {
+        <button #navToggler class="navbar-toggler btn-green me-4" type="button"
+            (click)="isMenuCollapsed = !isMenuCollapsed">&#9776;</button>
+
+        <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse">
+            @if (isTogglerVisible) {
+            <ul class="navbar-nav">
+                <li class="nav-item" routerLinkActive="active">
+                    <a routerLink="/department/list" class="nav-link">Departments</a>
+                </li>
+                <li class="nav-item" routerLinkActive="active">
+                    <a routerLink="/employee/list" class="nav-link">Employees</a>
+                </li>
+                <li class="nav-item" routerLinkActive="active">
+                    <a routerLink="/job/list" class="nav-link">Jobs</a>
+                </li>
+                <li class="nav-item" routerLinkActive="active">
+                    <a routerLink="/dashboard" class="nav-link">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link w-100" (click)="tryLogout()">Logout</button>
+                </li>
+            </ul>
+            }
+            @else {
+            <ul class="navbar-nav">
+                <li class="nav-item" routerLinkActive="active">
+                    <a routerLink="/department/list" class="nav-link">Departments</a>
+                </li>
+                <li class="nav-item" routerLinkActive="active">
+                    <a routerLink="/employee/list" class="nav-link">Employees</a>
+                </li>
+                <li class="nav-item" routerLinkActive="active">
+                    <a routerLink="/job/list" class="nav-link">Jobs</a>
+                </li>
+            </ul>
+            <div class="d-flex w-100 justify-content-end">
+                <ul class="navbar-nav">
+                    @if (roles.includes('Admin')) {
+                    <li class="nav-item" routerLinkActive="active">
+                        <a routerLink="/dashboard" class="nav-link">Dashboard</a>
+                    </li>
+                    }
+                    <li class="nav-item me-4">
+                        <button class="nav-link w-100" (click)="tryLogout()">Logout</button>
+                    </li>
+                </ul>
+            </div>
+            }
+        </div>
+        }
+
+    </div>
+</nav>

@@ -1,0 +1,23 @@
+.navbar {
+    box-shadow: 0px -25px 10px 20px #000;
+}
+
+.nav-item {
+  pointer-events: none;
+  padding: 8px 12px;
+}
+
+.nav-item:hover:not(.active) {
+  cursor: pointer;
+  box-shadow: inset 0px -4px #6b8f7f;
+}
+
+.nav-link {
+  pointer-events: auto;
+  text-align: start;
+}
+
+.active {
+  background-color: #f0f0f0;
+  box-shadow: inset 0px -4px #3b5f4f;
+}

@@ -1,0 +1,11 @@
+.bg-leaf {
+    padding: 0;
+    background-color: #0a3723;
+}
+
+.bg-pattern {
+    height: 100%;
+    width: 100%;
+    background-image: url("/assets/geometric-leaves.webp");
+    filter: grayscale() opacity(20%);
+}
