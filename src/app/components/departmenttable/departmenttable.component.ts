@@ -7,6 +7,8 @@ import { GetLocationVM } from '../../interfaces/locations/get-location-vm';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { Router } from '@angular/router';
+import { CreateDepartmentVM } from '../../interfaces/department/create-department-vm';
+import { UpdateDepartmentVM } from '../../interfaces/department/update-department-vm';
 
 @Component({
   selector: 'app-departmenttable',
@@ -100,8 +102,13 @@ export class DepartmenttableComponent implements OnInit{
     const name = this.createDepartmentForm.value["name"]!;
     const locationId = this.createDepartmentForm.value["locationId"]!;
 
+    const department: CreateDepartmentVM = {
+      departmentName: name,
+      locationId: locationId
+    };
+
     if (this.createDepartmentForm.valid) {
-      this.departmentService.addDepartment(name, locationId).subscribe({
+      this.departmentService.addDepartment(department).subscribe({
         next: () => {
           window.location.reload();
         },
@@ -130,8 +137,13 @@ export class DepartmenttableComponent implements OnInit{
     const name = this.updateDepartmentForm.value["name"]!;
     const locationId = this.updateDepartmentForm.value["locationId"]!;
 
+    const department: UpdateDepartmentVM = {
+      departmentName: name,
+      locationId: locationId
+    };
+
     if (this.updateDepartmentForm.valid) {
-      this.departmentService.updateDepartment(departmentId, name, locationId).subscribe({
+      this.departmentService.updateDepartment(departmentId, department).subscribe({
         next: () => {
           this.updateTarget = undefined;
           window.location.reload();

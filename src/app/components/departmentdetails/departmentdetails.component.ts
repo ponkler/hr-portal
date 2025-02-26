@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { DepartmentService } from '../../services/department/department.service';
+import { LocationService } from '../../services/location/location.service';
+import { EmployeeService } from '../../services/employee/employee.service';
 
 @Component({
   selector: 'app-departmentdetails',
@@ -7,5 +10,7 @@ import { Component } from '@angular/core';
   styleUrl: './departmentdetails.component.css'
 })
 export class DepartmentdetailsComponent {
-
+  departmentService = inject(DepartmentService)
+  locationService = inject(LocationService)
+  employeeService = inject(EmployeeService)
 }
