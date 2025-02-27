@@ -34,10 +34,13 @@ export class DepartmentService {
     );
   }
 
-  addDepartment(department: CreateDepartmentVM) {
+  createDepartment(department: CreateDepartmentVM) {
     return this.http.post<GetDepartmentVM>(
       `${this.apiUrl}/api/department`, 
-      { department } ,
+      { 
+        departmentName: department.departmentName,
+        locationId: department.locationId
+      },
       { withCredentials: true }
     );
   }
@@ -52,7 +55,10 @@ export class DepartmentService {
   updateDepartment(departmentId: number, department: UpdateDepartmentVM) {
     return this.http.put(
       `${this.apiUrl}/api/department/id=${departmentId}`, 
-      { department }, 
+      { 
+        departmentName: department.departmentName,
+        locationId: department.locationId
+      },
       { withCredentials: true }
     );
   }

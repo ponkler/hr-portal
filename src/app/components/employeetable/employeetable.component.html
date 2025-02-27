@@ -9,24 +9,108 @@
             <div *ngIf="error" class="error mb-2 p-2">
                 {{ error }}
             </div>
-            <form class="form" id="createForm" [formGroup]="createEmployeeForm">
-                <div class="row mb-2">
+            <form class="form" id="createForm" [formGroup]="createEmployeeForm" (ngSubmit)="createEmployee()">
+                <div class="row mb-3">
                     <div class="col">
                         <label for="employeeFirstName" class="form-required form-label">First Name</label>
-                        <input type="text" class="form-control" id="firstName" formControlName="firstName" required>
+                        <input type="text" class="form-control" id="employeeFirstName" formControlName="firstName"
+                            required>
+                        <div *ngIf="createFirstName!.invalid && (createFirstName!.dirty || createFirstName!.touched)">
+                            <span *ngIf="createFirstName!.hasError('required')" class="text-danger">First name is
+                                required</span>
+                        </div>
                     </div>
                     <div class="col">
                         <label for="employeeLastName" class="form-required form-label">Last Name</label>
-                        <input type="text" class="form-control" id="lastName" formControlName="lastName" required>
+                        <input type="text" class="form-control" id="employeeLastName" formControlName="lastName"
+                            required>
+                        <div *ngIf="createLastName!.invalid && (createLastName!.dirty || createLastName!.touched)">
+                            <span *ngIf="createLastName!.hasError('required')" class="text-danger">Last name is
+                                required</span>
+                        </div>
                     </div>
                 </div>
-                <div class="mb-2">
+                <div class="mb-3">
                     <label for="employeeEmail" class="form-required form-label">Email</label>
-                    <input type="text" class="form-control" id="email" formControlName="email" required>
+                    <input type="text" class="form-control" id="employeeEmail" formControlName="email" required>
+                    <div *ngIf="createEmail!.invalid && (createEmail!.dirty || createEmail!.touched)">
+                        <span *ngIf="createEmail!.hasError('required')" class="text-danger">Email is
+                            required</span>
+                    </div>
                 </div>
-                <div>
-                    <label for="employeePhoneNumber" class="form-label">Phone Number</label>
-                    <input type="text" class="form-control" id="phoneNumber" formControlName="phoneNumber" required>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="employeePhoneNumber" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="employeePhoneNumber" formControlName="phoneNumber">
+                    </div>
+                    <div class="col">
+                        <label for="employeeHireDate" class="form-label">Hire Date</label>
+                        <input type="date" class="form-control" id="employeeHireDate" formControlName="hireDate"
+                            required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="employeeJobId" class="form-label form-required">Job Title</label>
+                    <select class="form-control form-select" id="employeeJobId" type="number" formControlName="jobId"
+                        required>
+                        @for (job of jobs; track job.jobId) {
+                        <option type="number" value={{job.jobId}}>
+                            {{job.jobTitle}}
+                        </option>
+                        }
+                    </select>
+                    <div *ngIf="createJobId!.invalid && (createJobId!.dirty || createJobId!.touched)">
+                        <span *ngIf="createJobId!.hasError('required')" class="text-danger">Job title is
+                            required</span>
+                    </div>
+                </div>
+                @if (createEmployeeForm.controls['jobId'].value) {
+                <div class="mb-3">
+                    <label for="employeeSalary" class="form-label form-required">Salary</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="employeeSalary" formControlName="salary">
+                        <span class="input-group-text">.00</span>
+                    </div>
+                    <small>Valid range: {{selectedJob.minSalary | currency}} - {{selectedJob.maxSalary |
+                        currency}}</small>
+                    <div *ngIf="createSalary!.invalid && (createSalary!.dirty || createSalary!.touched)">
+                        <span *ngIf="createSalary!.hasError('required')" class="text-danger">Salary is required</span>
+                        <span *ngIf="createSalary!.hasError('min')" class="text-danger">Salary is below the minimum
+                            salary for the selected job</span>
+                        <span *ngIf="createSalary!.hasError('max')" class="text-danger">Salary is above the maximum
+                            salary for the selected job</span>
+                    </div>
+                </div>
+                }
+                <div class="row">
+                    <div class="col">
+                        <label for="employeeManagerId" class="form-label">Manager</label>
+                        <select class="form-control form-select" id="employeeManagerId" formControlName="managerId">
+                            @for (department of departments; track department.departmentId) {
+                            <optgroup label="{{department.departmentName}}">
+                                @for (employee of sortedEmployees; track employee.employeeId) {
+                                    @if (employee.departmentName == department.departmentName) {
+                                    <option value={{employee.employeeId}}>
+                                        {{employee.firstName}} {{employee.lastName}}, {{employee.jobTitle}}
+                                    </option>
+                                    }
+                                }
+                            </optgroup>
+                            }
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="employeeDepartmentId" class="form-label">Department</label>
+                        <select class="form-control form-select" id="employeeDepartmentId"
+                            formControlName="departmentId">
+                            @for (department of departments; track department.departmentId) {
+                            <option value={{department.departmentId}}>
+                                {{department.departmentName}}
+                            </option>
+                            }
+                        </select>
+                    </div>
                 </div>
             </form>
         </div>
@@ -48,11 +132,115 @@
             <div *ngIf="error" class="error mb-2 p-2">
                 {{ error }}
             </div>
+            <form class="form" id="updateForm" [formGroup]="updateEmployeeForm" (ngSubmit)="updateEmployee(updateTarget?.employeeId!)">
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="employeeFirstName" class="form-required form-label">First Name</label>
+                        <input type="text" class="form-control" id="employeeFirstName" formControlName="firstName"
+                            required>
+                        <div *ngIf="updateFirstName!.invalid && (updateFirstName!.dirty || updateFirstName!.touched)">
+                            <span *ngIf="updateFirstName!.hasError('required')" class="text-danger">First name is
+                                required</span>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <label for="employeeLastName" class="form-required form-label">Last Name</label>
+                        <input type="text" class="form-control" id="employeeLastName" formControlName="lastName"
+                            required>
+                        <div *ngIf="updateLastName!.invalid && (updateLastName!.dirty || updateLastName!.touched)">
+                            <span *ngIf="updateLastName!.hasError('required')" class="text-danger">Last name is
+                                required</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="employeeEmail" class="form-required form-label">Email</label>
+                    <input type="text" class="form-control" id="employeeEmail" formControlName="email" required>
+                    <div *ngIf="updateEmail!.invalid && (updateEmail!.dirty || updateEmail!.touched)">
+                        <span *ngIf="updateEmail!.hasError('required')" class="text-danger">Email is
+                            required</span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="employeePhoneNumber" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="employeePhoneNumber" formControlName="phoneNumber">
+                    </div>
+                    <div class="col">
+                        <label for="employeeHireDate" class="form-label">Hire Date</label>
+                        <input type="date" class="form-control" id="employeeHireDate" formControlName="hireDate"
+                            required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="employeeJobId" class="form-label form-required">Job Title</label>
+                    <select class="form-control form-select" id="employeeJobId" type="number" formControlName="jobId"
+                        required>
+                        @for (job of jobs; track job.jobId) {
+                        <option type="number" value={{job.jobId}}>
+                            {{job.jobTitle}}
+                        </option>
+                        }
+                    </select>
+                    <div *ngIf="updateJobId!.invalid && (updateJobId!.dirty || updateJobId!.touched)">
+                        <span *ngIf="updateJobId!.hasError('required')" class="text-danger">Job title is
+                            required</span>
+                    </div>
+                </div>
+                @if (updateEmployeeForm.controls['jobId'].value) {
+                <div class="mb-3">
+                    <label for="employeeSalary" class="form-label form-required">Salary</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="employeeSalary" formControlName="salary">
+                        <span class="input-group-text">.00</span>
+                    </div>
+                    <small>Valid range: {{selectedJob.minSalary | currency}} - {{selectedJob.maxSalary |
+                        currency}}</small>
+                    <div *ngIf="updateSalary!.invalid && (updateSalary!.dirty || updateSalary!.touched)">
+                        <span *ngIf="updateSalary!.hasError('required')" class="text-danger">Salary is required</span>
+                        <span *ngIf="updateSalary!.hasError('min')" class="text-danger">Salary is below the minimum
+                            salary for the selected job</span>
+                        <span *ngIf="updateSalary!.hasError('max')" class="text-danger">Salary is above the maximum
+                            salary for the selected job</span>
+                    </div>
+                </div>
+                }
+                <div class="row">
+                    <div class="col">
+                        <label for="employeeManagerId" class="form-label">Manager</label>
+                        <select class="form-control form-select" id="employeeManagerId" formControlName="managerId">
+                            @for (department of departments; track department.departmentId) {
+                            <optgroup label="{{department.departmentName}}">
+                                @for (employee of sortedEmployees; track employee.employeeId) {
+                                    @if (employee.departmentName == department.departmentName) {
+                                    <option value={{employee.employeeId}}>
+                                        {{employee.firstName}} {{employee.lastName}}, {{employee.jobTitle}}
+                                    </option>
+                                    }
+                                }
+                            </optgroup>
+                            }
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="employeeDepartmentId" class="form-label">Department</label>
+                        <select class="form-control form-select" id="employeeDepartmentId"
+                            formControlName="departmentId">
+                            @for (department of departments; track department.departmentId) {
+                            <option value={{department.departmentId}}>
+                                {{department.departmentName}}
+                            </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancel</button>
-        <button type="submit" form="createForm" class="btn btn-outline-green">Submit</button>
+        <button type="submit" form="updateForm" class="btn btn-outline-green">Submit</button>
     </div>
 </ng-template>
 
@@ -64,12 +252,13 @@
     </div>
     <div class="modal-body">
         <div class="mb-3">
-            <p>Are you sure you want to delete ?</p>
+            <p>Are you sure you want to delete {{deleteTarget?.firstName}} {{deleteTarget?.lastName}}?</p>
         </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancel</button>
-        <button type="button" class="btn btn-outline-danger">Delete</button>
+        <button type="button" class="btn btn-outline-danger"
+            (click)="deleteEmployee(deleteTarget?.employeeId!)">Delete</button>
     </div>
 </ng-template>
 

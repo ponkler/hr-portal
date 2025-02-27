@@ -57,7 +57,17 @@ export class EmployeeService {
   createEmployee(employee: CreateEmployeeVM) {
     return this.http.post<GetEmployeeVM>(
       `${this.apiUrl}/api/employee/`,
-      { employee },
+      { 
+        firstName: employee.firstName,
+        lastName: employee.lastName,
+        email: employee.email,
+        phoneNumber: employee.phoneNumber,
+        hireDate: employee.hireDate,
+        jobId: employee.jobId,
+        salary: employee.salary,
+        managerId: employee.managerId,
+        departmentId: employee.departmentId
+      },
       { withCredentials: true }
     );
   }
@@ -65,7 +75,17 @@ export class EmployeeService {
   updateEmployee(employeeId: number, employee: UpdateEmployeeVM) {
     return this.http.put(
       `${this.apiUrl}/api/employee/id=${employeeId}`,
-      { employee },
+      { 
+        firstName: employee.firstName,
+        lastName: employee.lastName,
+        email: employee.email,
+        phoneNumber: employee.phoneNumber,
+        hireDate: employee.hireDate,
+        jobId: employee.jobId,
+        salary: employee.salary,
+        managerId: employee.managerId,
+        departmentId: employee.departmentId
+      },
       { withCredentials: true }
     );
   }

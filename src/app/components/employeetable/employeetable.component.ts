@@ -9,6 +9,8 @@ import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
+import { CreateEmployeeVM } from '../../interfaces/employees/create-employee-vm';
+import { UpdateEmployeeVM } from '../../interfaces/employees/update-employee-vm';
 
 @Component({
   selector: 'app-employeetable',
@@ -24,8 +26,11 @@ export class EmployeetableComponent implements OnInit {
   private router = inject(Router);
 
   employees: GetEmployeeVM[] = [];
+  sortedEmployees: GetEmployeeVM[] = [];
   departments: GetDepartmentVM[] = [];
   jobs: GetJobVM[] = [];
+
+  selectedJob: any;
 
   deleteTarget: GetEmployeeVM | undefined;
   updateTarget: GetEmployeeVM | undefined;
@@ -55,7 +60,7 @@ export class EmployeetableComponent implements OnInit {
     ]),
     managerId: new FormControl(0),
     departmentId: new FormControl(0)
-  })
+  });
 
   //============================================================================
   // Update Employee Form
@@ -72,9 +77,7 @@ export class EmployeetableComponent implements OnInit {
     ]),
     phoneNumber: new FormControl(''),
     hireDate: new FormControl(new Date),
-    jobId: new FormControl(0, [
-      Validators.required
-    ]),
+    jobId: new FormControl(0),
     salary: new FormControl(0, [
       Validators.required
     ]),
@@ -87,12 +90,44 @@ export class EmployeetableComponent implements OnInit {
   //============================================================================
   ngOnInit() {
     this.getData();
+    this.createEmployeeForm.get('jobId')?.valueChanges.subscribe(value => {
+      if (value) {
+        this.selectedJob = this.jobs.find((job) => job.jobId == value);
+        const min = this.selectedJob?.minSalary ? this.selectedJob?.minSalary : 1;
+        const max = this.selectedJob?.maxSalary ? this.selectedJob?.maxSalary : 1;
+
+        this.createEmployeeForm.get('salary')?.setValidators([
+          Validators.required,
+          Validators.min(min),
+          Validators.max(max)
+        ]);
+
+        this.createEmployeeForm.get('salary')?.updateValueAndValidity({ onlySelf: true });
+      }
+    })
+
+    this.updateEmployeeForm.get('jobId')?.valueChanges.subscribe(value => {
+      if (value) {
+        this.selectedJob = this.jobs.find((job) => job.jobId == value);
+        const min = this.selectedJob?.minSalary ? this.selectedJob?.minSalary : 1;
+        const max = this.selectedJob?.maxSalary ? this.selectedJob?.maxSalary : 1;
+
+        this.createEmployeeForm.get('salary')?.setValidators([
+          Validators.required,
+          Validators.min(min),
+          Validators.max(max)
+        ]);
+
+        this.createEmployeeForm.get('salary')?.updateValueAndValidity({ onlySelf: true });
+      }
+    })
   }
 
   getData() {
     this.employeeService.getEmployees().subscribe({
       next: (response) => {
         this.employees = response;
+        this.sortedEmployees = response.toSorted((a, b) => a.lastName.localeCompare(b.lastName));
       },
       error: (err) => {
         console.error("Error retrieving employees:")
@@ -100,7 +135,7 @@ export class EmployeetableComponent implements OnInit {
     });
     this.departmentService.getDepartments().subscribe({
       next: (response) => {
-        this.departments = response;
+        this.departments = response.sort((a, b) => a.departmentName.localeCompare(b.departmentName));
       },
       error: (err) => {
         console.error("Error retrieving departments:", err);
@@ -108,7 +143,7 @@ export class EmployeetableComponent implements OnInit {
     });
     this.jobService.getJobs().subscribe({
       next: (response) => {
-        this.jobs = response;
+        this.jobs = response.sort((a, b) => a.jobTitle.localeCompare(b.jobTitle));
       },
       error: (err) => {
         console.error("Error retrieving jobs:", err)
@@ -120,7 +155,7 @@ export class EmployeetableComponent implements OnInit {
     this.error = null;
     this.createEmployeeForm.reset();
     this.createEmployeeForm.clearValidators();
-    this.modalService.open(content);
+    this.modalService.open(content, {size: 'lg'});
   }
 
   openEdit(content: TemplateRef<any>, employeeId: number) {
@@ -130,19 +165,19 @@ export class EmployeetableComponent implements OnInit {
     this.updateEmployeeForm.clearValidators();
 
     this.updateTarget = this.employees.find((employee) => employee.employeeId == employeeId);
-    
-    const departmentId = this.departments.find((department) => 
+
+    const departmentId = this.departments.find((department) =>
       department.departmentName == this.updateTarget?.departmentName)
-    ?.departmentId;
+      ?.departmentId;
 
-    const jobId = this.jobs.find((job) => 
+    const jobId = this.jobs.find((job) =>
       job.jobTitle == this.updateTarget?.jobTitle)
-    ?.jobId;
+      ?.jobId;
 
-    const managerId = this.employees.find((employee) => 
-      employee.firstName == this.updateTarget?.managerFirstName 
+    const managerId = this.employees.find((employee) =>
+      employee.firstName == this.updateTarget?.managerFirstName
       && employee.lastName == this.updateTarget?.managerLastName)
-    ?.employeeId;
+      ?.employeeId;
 
     this.updateEmployeeForm.controls['firstName'].setValue(this.updateTarget?.firstName!, { onlySelf: true })
     this.updateEmployeeForm.controls['lastName'].setValue(this.updateTarget?.lastName!, { onlySelf: true })
@@ -154,14 +189,100 @@ export class EmployeetableComponent implements OnInit {
     this.updateEmployeeForm.controls['managerId'].setValue(managerId!, { onlySelf: true })
     this.updateEmployeeForm.controls['departmentId'].setValue(departmentId!, { onlySelf: true })
 
-    this.modalService.open(content);
+    this.modalService.open(content, {size: 'lg'});
   }
 
   openDelete(content: TemplateRef<any>, employeeId: number) {
-    this.deleteTarget = this.employees.find((employee) => 
+    this.deleteTarget = this.employees.find((employee) =>
       employee.employeeId == employeeId);
 
     this.modalService.open(content);
+  }
+
+  createEmployee() {
+    const firstName = this.createEmployeeForm.value['firstName'];
+    const lastName = this.createEmployeeForm.value['lastName'];
+    const email = this.createEmployeeForm.value['email'];
+    const phoneNumber = this.createEmployeeForm.value['phoneNumber'];
+    const hireDate = this.createEmployeeForm.value['hireDate'];
+    const jobId = Number(this.createEmployeeForm.value['jobId']);
+    const salary = this.createEmployeeForm.value['salary'];
+    const managerId = Number(this.createEmployeeForm.value['managerId']);
+    const departmentId = Number(this.createEmployeeForm.value['departmentId']);
+
+    const employee: CreateEmployeeVM = {
+      firstName: firstName!,
+      lastName: lastName!,
+      email: email!,
+      phoneNumber: phoneNumber!,
+      hireDate: hireDate!,
+      jobId: jobId!,
+      salary: salary!,
+      managerId: managerId!,
+      departmentId: departmentId!
+    }
+
+    if (this.createEmployeeForm.valid) {
+      this.employeeService.createEmployee(employee).subscribe({
+        next: () => {
+          window.location.reload();
+        },
+        error: (err) => {
+          console.error("Error creating employee:", err);
+        }
+      })
+    } else {
+      this.error = "There was an issue with your submission. Please try again."
+    }
+  }
+
+  updateEmployee(employeeId: number) {
+    const firstName = this.updateEmployeeForm.value['firstName'];
+    const lastName = this.updateEmployeeForm.value['lastName'];
+    const email = this.updateEmployeeForm.value['email'];
+    const phoneNumber = this.updateEmployeeForm.value['phoneNumber'];
+    const hireDate = this.updateEmployeeForm.value['hireDate'];
+    const jobId = Number(this.updateEmployeeForm.value['jobId']);
+    const salary = this.updateEmployeeForm.value['salary'];
+    const managerId = Number(this.updateEmployeeForm.value['managerId']);
+    const departmentId = Number(this.updateEmployeeForm.value['departmentId']);
+
+    const employee: UpdateEmployeeVM = {
+      firstName: firstName!,
+      lastName: lastName!,
+      email: email!,
+      phoneNumber: phoneNumber!,
+      hireDate: hireDate!,
+      jobId: jobId!,
+      salary: salary!,
+      managerId: managerId!,
+      departmentId: departmentId!
+    }
+
+    if (this.updateEmployeeForm.valid) {
+      this.employeeService.updateEmployee(employeeId, employee).subscribe({
+        next: () => {
+          window.location.reload();
+        },
+        error: (err) => {
+          console.error("Error updating employee:", err);
+        }
+      })
+    } else {
+      this.error = "There was an issue with your submission. Please try again."
+    }
+  }
+
+  deleteEmployee(employeeId: number) {
+    this.employeeService.deleteEmployee(employeeId).subscribe({
+      next: () => {
+        this.deleteTarget = undefined;
+        window.location.reload();
+      },
+      error: (err) => {
+        console.error("Error deleting employee:", err);
+      }
+    })
   }
 
   redirectToDetails(employeeId: number) {

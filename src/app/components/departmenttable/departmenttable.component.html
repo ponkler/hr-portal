@@ -19,7 +19,6 @@
           <div class="form-group mt-2">
             <label for="departmentLocation" class="form-required">Location</label>
             <select class="form-control form-select" id="locationId" formControlName="locationId" required>
-              <option [selected]="this">Select a location...</option>
               @for (location of locations; track location.locationId) {
                 <option value={{location.locationId}}>
                   @if (location.streetAddress) {
