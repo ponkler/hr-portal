@@ -1,5 +1,4 @@
-import { FormGroup } from "@angular/forms";
-
 export interface CreateDepartmentVM {
-    
+    departmentName: string;
+    locationId: number | null;
 }

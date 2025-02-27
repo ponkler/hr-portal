@@ -1,0 +1,334 @@
+<ng-template #add let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title ms-1" id="modal-basic-title">Add New Employee</h4>
+        <button type="button" class="btn-close btn-close-white me-1" aria-label="Close"
+            (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        <div class="mb-3">
+            <div *ngIf="error" class="error mb-2 p-2">
+                {{ error }}
+            </div>
+            <form class="form" id="createForm" [formGroup]="createEmployeeForm" (ngSubmit)="createEmployee()">
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="employeeFirstName" class="form-required form-label">First Name</label>
+                        <input type="text" class="form-control" id="employeeFirstName" formControlName="firstName"
+                            required>
+                        <div *ngIf="createFirstName!.invalid && (createFirstName!.dirty || createFirstName!.touched)">
+                            <span *ngIf="createFirstName!.hasError('required')" class="text-danger">First name is
+                                required</span>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <label for="employeeLastName" class="form-required form-label">Last Name</label>
+                        <input type="text" class="form-control" id="employeeLastName" formControlName="lastName"
+                            required>
+                        <div *ngIf="createLastName!.invalid && (createLastName!.dirty || createLastName!.touched)">
+                            <span *ngIf="createLastName!.hasError('required')" class="text-danger">Last name is
+                                required</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="employeeEmail" class="form-required form-label">Email</label>
+                    <input type="text" class="form-control" id="employeeEmail" formControlName="email" required>
+                    <div *ngIf="createEmail!.invalid && (createEmail!.dirty || createEmail!.touched)">
+                        <span *ngIf="createEmail!.hasError('required')" class="text-danger">Email is
+                            required</span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="employeePhoneNumber" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="employeePhoneNumber" formControlName="phoneNumber">
+                    </div>
+                    <div class="col">
+                        <label for="employeeHireDate" class="form-label">Hire Date</label>
+                        <input type="date" class="form-control" id="employeeHireDate" formControlName="hireDate"
+                            required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="employeeJobId" class="form-label form-required">Job Title</label>
+                    <select class="form-control form-select" id="employeeJobId" type="number" formControlName="jobId"
+                        required>
+                        @for (job of jobs; track job.jobId) {
+                        <option type="number" value={{job.jobId}}>
+                            {{job.jobTitle}}
+                        </option>
+                        }
+                    </select>
+                    <div *ngIf="createJobId!.invalid && (createJobId!.dirty || createJobId!.touched)">
+                        <span *ngIf="createJobId!.hasError('required')" class="text-danger">Job title is
+                            required</span>
+                    </div>
+                </div>
+                @if (createEmployeeForm.controls['jobId'].value) {
+                <div class="mb-3">
+                    <label for="employeeSalary" class="form-label form-required">Salary</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="employeeSalary" formControlName="salary">
+                        <span class="input-group-text">.00</span>
+                    </div>
+                    <small>Valid range: {{selectedJob.minSalary | currency}} - {{selectedJob.maxSalary |
+                        currency}}</small>
+                    <div *ngIf="createSalary!.invalid && (createSalary!.dirty || createSalary!.touched)">
+                        <span *ngIf="createSalary!.hasError('required')" class="text-danger">Salary is required</span>
+                        <span *ngIf="createSalary!.hasError('min')" class="text-danger">Salary is below the minimum
+                            salary for the selected job</span>
+                        <span *ngIf="createSalary!.hasError('max')" class="text-danger">Salary is above the maximum
+                            salary for the selected job</span>
+                    </div>
+                </div>
+                }
+                <div class="row">
+                    <div class="col">
+                        <label for="employeeManagerId" class="form-label">Manager</label>
+                        <select class="form-control form-select" id="employeeManagerId" formControlName="managerId">
+                            @for (department of departments; track department.departmentId) {
+                            <optgroup label="{{department.departmentName}}">
+                                @for (employee of sortedEmployees; track employee.employeeId) {
+                                    @if (employee.departmentName == department.departmentName) {
+                                    <option value={{employee.employeeId}}>
+                                        {{employee.firstName}} {{employee.lastName}}, {{employee.jobTitle}}
+                                    </option>
+                                    }
+                                }
+                            </optgroup>
+                            }
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="employeeDepartmentId" class="form-label">Department</label>
+                        <select class="form-control form-select" id="employeeDepartmentId"
+                            formControlName="departmentId">
+                            @for (department of departments; track department.departmentId) {
+                            <option value={{department.departmentId}}>
+                                {{department.departmentName}}
+                            </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancel</button>
+        <button type="submit" form="createForm" class="btn btn-outline-green">Submit</button>
+    </div>
+</ng-template>
+
+<ng-template #edit let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title ms-1" id="modal-basic-title">Edit Employee</h4>
+        <button type="button" class="btn-close btn-close-white me-1" aria-label="Close"
+            (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        <div class="mb-3">
+            <div *ngIf="error" class="error mb-2 p-2">
+                {{ error }}
+            </div>
+            <form class="form" id="updateForm" [formGroup]="updateEmployeeForm" (ngSubmit)="updateEmployee(updateTarget?.employeeId!)">
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="employeeFirstName" class="form-required form-label">First Name</label>
+                        <input type="text" class="form-control" id="employeeFirstName" formControlName="firstName"
+                            required>
+                        <div *ngIf="updateFirstName!.invalid && (updateFirstName!.dirty || updateFirstName!.touched)">
+                            <span *ngIf="updateFirstName!.hasError('required')" class="text-danger">First name is
+                                required</span>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <label for="employeeLastName" class="form-required form-label">Last Name</label>
+                        <input type="text" class="form-control" id="employeeLastName" formControlName="lastName"
+                            required>
+                        <div *ngIf="updateLastName!.invalid && (updateLastName!.dirty || updateLastName!.touched)">
+                            <span *ngIf="updateLastName!.hasError('required')" class="text-danger">Last name is
+                                required</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="employeeEmail" class="form-required form-label">Email</label>
+                    <input type="text" class="form-control" id="employeeEmail" formControlName="email" required>
+                    <div *ngIf="updateEmail!.invalid && (updateEmail!.dirty || updateEmail!.touched)">
+                        <span *ngIf="updateEmail!.hasError('required')" class="text-danger">Email is
+                            required</span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="employeePhoneNumber" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="employeePhoneNumber" formControlName="phoneNumber">
+                    </div>
+                    <div class="col">
+                        <label for="employeeHireDate" class="form-label">Hire Date</label>
+                        <input type="date" class="form-control" id="employeeHireDate" formControlName="hireDate"
+                            required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="employeeJobId" class="form-label form-required">Job Title</label>
+                    <select class="form-control form-select" id="employeeJobId" type="number" formControlName="jobId"
+                        required>
+                        @for (job of jobs; track job.jobId) {
+                        <option type="number" value={{job.jobId}}>
+                            {{job.jobTitle}}
+                        </option>
+                        }
+                    </select>
+                    <div *ngIf="updateJobId!.invalid && (updateJobId!.dirty || updateJobId!.touched)">
+                        <span *ngIf="updateJobId!.hasError('required')" class="text-danger">Job title is
+                            required</span>
+                    </div>
+                </div>
+                @if (updateEmployeeForm.controls['jobId'].value) {
+                <div class="mb-3">
+                    <label for="employeeSalary" class="form-label form-required">Salary</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="employeeSalary" formControlName="salary">
+                        <span class="input-group-text">.00</span>
+                    </div>
+                    <small>Valid range: {{selectedJob.minSalary | currency}} - {{selectedJob.maxSalary |
+                        currency}}</small>
+                    <div *ngIf="updateSalary!.invalid && (updateSalary!.dirty || updateSalary!.touched)">
+                        <span *ngIf="updateSalary!.hasError('required')" class="text-danger">Salary is required</span>
+                        <span *ngIf="updateSalary!.hasError('min')" class="text-danger">Salary is below the minimum
+                            salary for the selected job</span>
+                        <span *ngIf="updateSalary!.hasError('max')" class="text-danger">Salary is above the maximum
+                            salary for the selected job</span>
+                    </div>
+                </div>
+                }
+                <div class="row">
+                    <div class="col">
+                        <label for="employeeManagerId" class="form-label">Manager</label>
+                        <select class="form-control form-select" id="employeeManagerId" formControlName="managerId">
+                            @for (department of departments; track department.departmentId) {
+                            <optgroup label="{{department.departmentName}}">
+                                @for (employee of sortedEmployees; track employee.employeeId) {
+                                    @if (employee.departmentName == department.departmentName) {
+                                    <option value={{employee.employeeId}}>
+                                        {{employee.firstName}} {{employee.lastName}}, {{employee.jobTitle}}
+                                    </option>
+                                    }
+                                }
+                            </optgroup>
+                            }
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="employeeDepartmentId" class="form-label">Department</label>
+                        <select class="form-control form-select" id="employeeDepartmentId"
+                            formControlName="departmentId">
+                            @for (department of departments; track department.departmentId) {
+                            <option value={{department.departmentId}}>
+                                {{department.departmentName}}
+                            </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancel</button>
+        <button type="submit" form="updateForm" class="btn btn-outline-green">Submit</button>
+    </div>
+</ng-template>
+
+<ng-template #delete let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title ms-1" id="modal-basic-title">Delete Employee</h4>
+        <button type="button" class="btn-close btn-close-white me-1" aria-label="Close"
+            (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        <div class="mb-3">
+            <p>Are you sure you want to delete {{deleteTarget?.firstName}} {{deleteTarget?.lastName}}?</p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancel</button>
+        <button type="button" class="btn btn-outline-danger"
+            (click)="deleteEmployee(deleteTarget?.employeeId!)">Delete</button>
+    </div>
+</ng-template>
+
+<div class="d-flex w-100 mx-2 mb-2">
+    <h1 class="">Employees</h1>
+    <div class="container-fluid d-flex justify-content-end">
+        <button type="button" class="btn btn-green px-4 me-2" (click)="openAdd(add)">
+            <h6 class="m-auto">Add New Employee</h6>
+        </button>
+    </div>
+</div>
+
+<div class="container-fluid table-responsive">
+    <table class="table table-bordered table-sm">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Job Title</th>
+                <th scope="col">Department</th>
+                <th scope="col">Salary</th>
+                <th scope="col">Manager</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (employee of employees; track employee.employeeId) {
+            <tr class="align-middle">
+                <th scope="row">{{employee.employeeId}}</th>
+                <td>{{employee.firstName}} {{employee.lastName}}</td>
+                <td>{{employee.jobTitle}}</td>
+                <td>{{employee.departmentName}}</td>
+                <td>{{employee.salary | currency }}</td>
+                <td>{{employee.managerFirstName}} {{employee.managerLastName}}</td>
+                <td>
+                    <div>
+                        <button type="button" class="btn btn-green m-1 p-2"
+                            (click)="redirectToDetails(employee.employeeId)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="d-flex" viewBox="0 0 16 16">
+                                <path
+                                    d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+                                <path
+                                    d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                            </svg>
+                        </button>
+                        <button type="button" class="btn btn-green m-1 p-2"
+                            (click)="openEdit(edit, employee.employeeId)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="d-flex" viewBox="0 0 16 16">
+                                <path
+                                    d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                <path fill-rule="evenodd"
+                                    d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+                            </svg>
+                        </button>
+                        <button type="button" class="btn btn-dark m-1 p-2"
+                            (click)="openDelete(delete, employee.employeeId)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="d-flex" viewBox="0 0 16 16">
+                                <path
+                                    d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+                                <path
+                                    d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+                            </svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>

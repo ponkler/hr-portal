@@ -7,6 +7,8 @@ import { GetLocationVM } from '../../interfaces/locations/get-location-vm';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
 import { Router } from '@angular/router';
+import { CreateDepartmentVM } from '../../interfaces/department/create-department-vm';
+import { UpdateDepartmentVM } from '../../interfaces/department/update-department-vm';
 
 @Component({
   selector: 'app-departmenttable',
@@ -16,13 +18,17 @@ import { Router } from '@angular/router';
   styleUrl: './departmenttable.component.css'
 })
 export class DepartmenttableComponent implements OnInit{
-  departmentService = inject(DepartmentService)
-  locationService = inject(LocationService)
-  router = inject(Router);
+  private departmentService = inject(DepartmentService)
+  private locationService = inject(LocationService)
+  private router = inject(Router);
+  private modalService = inject(NgbModal);
+
   departments: GetDepartmentVM[] = [];
   locations: GetLocationVM[] = [];
+
   deleteTarget: GetDepartmentVM | undefined;
   updateTarget: GetDepartmentVM | undefined;
+
   error: string | null = null;
 
   createDepartmentForm = new FormGroup({
@@ -43,7 +49,28 @@ export class DepartmenttableComponent implements OnInit{
     ])
   })
 
-  private modalService = inject(NgbModal)
+  ngOnInit() {
+    this.getData();
+  }
+
+  getData() {
+    this.departmentService.getDepartments().subscribe({
+      next: (result: GetDepartmentVM[]) => {
+        this.departments = result;
+      },
+      error: (err) => {
+        console.error('Error fetching departments:', err);
+      }
+    });
+    this.locationService.getLocations().subscribe({
+      next: (result: GetLocationVM[]) => {
+        this.locations = result;
+      },
+      error: (err) => {
+        console.error('Error fetching locations:', err);
+      }
+    });
+  }
 
   openAdd(content: TemplateRef<any>) {
     this.error = null;
@@ -73,35 +100,19 @@ export class DepartmenttableComponent implements OnInit{
     this.deleteTarget = this.departments.find((department) => department.departmentId == departmentId);
   }
 
-  ngOnInit() {
-    this.getData();
-  }
-
-  getData() {
-    this.departmentService.getDepartments().subscribe({
-      next: (result: GetDepartmentVM[]) => {
-        this.departments = result;
-      },
-      error: (err) => {
-        console.error('Error fetching departments:', err);
-      }
-    });
-    this.locationService.getLocations().subscribe({
-      next: (result: GetLocationVM[]) => {
-        this.locations = result;
-      },
-      error: (err) => {
-        console.error('Error fetching locations:', err);
-      }
-    });
-  }
-
   createDepartment() {
     const name = this.createDepartmentForm.value["name"]!;
     const locationId = this.createDepartmentForm.value["locationId"]!;
 
+    const department: CreateDepartmentVM = {
+      departmentName: name,
+      locationId: locationId
+    };
+
+    console.log(typeof(department.locationId));
+
     if (this.createDepartmentForm.valid) {
-      this.departmentService.addDepartment(name, locationId).subscribe({
+      this.departmentService.createDepartment(department).subscribe({
         next: () => {
           window.location.reload();
         },
@@ -130,8 +141,13 @@ export class DepartmenttableComponent implements OnInit{
     const name = this.updateDepartmentForm.value["name"]!;
     const locationId = this.updateDepartmentForm.value["locationId"]!;
 
+    const department: UpdateDepartmentVM = {
+      departmentName: name,
+      locationId: locationId
+    };
+
     if (this.updateDepartmentForm.valid) {
-      this.departmentService.updateDepartment(departmentId, name, locationId).subscribe({
+      this.departmentService.updateDepartment(departmentId, department).subscribe({
         next: () => {
           this.updateTarget = undefined;
           window.location.reload();

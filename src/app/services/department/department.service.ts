@@ -2,6 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, OnInit, TemplateRef } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { GetDepartmentVM } from '../../interfaces/department/get-department-vm';
+import { CreateDepartmentVM } from '../../interfaces/department/create-department-vm';
+import { UpdateDepartmentVM } from '../../interfaces/department/update-department-vm';
 
 @Injectable({
   providedIn: 'root'
@@ -11,16 +14,33 @@ export class DepartmentService {
   private apiUrl = environment.apiUrl;
 
   getDepartments() {
-    return this.http.get<any>(
+    return this.http.get<GetDepartmentVM[]>(
       `${this.apiUrl}/api/department`, 
       { withCredentials: true }
     );
   }
 
-  addDepartment(name : string, locationId : number) {
-    return this.http.post<{name : string, locationId : number}>(
+  getDepartmentById(departmentId: number) {
+    return this.http.get<GetDepartmentVM>(
+      `${this.apiUrl}/api/department/id=${departmentId}`, 
+      { withCredentials: true }
+    );
+  }
+
+  getDepartmentsByLocation(locationId: number) {
+    return this.http.get<GetDepartmentVM[]>(
+      `${this.apiUrl}/api/department/location=${locationId}`, 
+      { withCredentials: true }
+    );
+  }
+
+  createDepartment(department: CreateDepartmentVM) {
+    return this.http.post<GetDepartmentVM>(
       `${this.apiUrl}/api/department`, 
-      { departmentName: name, locationId: locationId } ,
+      { 
+        departmentName: department.departmentName,
+        locationId: department.locationId
+      },
       { withCredentials: true }
     );
   }
@@ -32,10 +52,13 @@ export class DepartmentService {
     );
   }
 
-  updateDepartment(departmentId: number, name: string, locationId: number) {
-    return this.http.put<{name: string, locationId: number}>(
+  updateDepartment(departmentId: number, department: UpdateDepartmentVM) {
+    return this.http.put(
       `${this.apiUrl}/api/department/id=${departmentId}`, 
-      {departmentName: name, locationId: locationId}, 
+      { 
+        departmentName: department.departmentName,
+        locationId: department.locationId
+      },
       { withCredentials: true }
     );
   }
