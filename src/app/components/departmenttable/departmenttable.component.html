@@ -58,7 +58,7 @@
         <div *ngIf="error" class="error mb-2 p-2">
           {{ error }}
         </div>
-        <form class="form" id="createForm" [formGroup]="updateDepartmentForm" (ngSubmit)="updateDepartment(updateTarget?.departmentId!)">
+        <form class="form" id="updateForm" [formGroup]="updateDepartmentForm" (ngSubmit)="updateDepartment(updateTarget?.departmentId!)">
           <div class="form-group">
             <label for="departmentName" class="form-required">Name</label>
             <input type="text" class="form-control" id="name" placeholder="Enter a name..." formControlName="name" required>
@@ -94,7 +94,7 @@
 	</div>
 	<div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancel</button>
-		<button type="submit" form="createForm" class="btn btn-outline-green">Submit</button>
+		<button type="submit" form="updateForm" class="btn btn-outline-green">Submit</button>
 	</div>
 </ng-template>
 
@@ -115,7 +115,7 @@
 </ng-template>
 
 <div class="d-flex w-100 mx-2 mb-2">
-  <h1 class="">Departments</h1>
+  <h1>Departments</h1>
   <div class="container-fluid d-flex justify-content-end">
     <button type="button" class="btn btn-green px-4 me-2" (click)="openAdd(add)">
       <h6 class="m-auto">Add New Department</h6>

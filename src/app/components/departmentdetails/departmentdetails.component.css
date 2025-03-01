@@ -1,0 +1,4 @@
+.list-group-scroll {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}

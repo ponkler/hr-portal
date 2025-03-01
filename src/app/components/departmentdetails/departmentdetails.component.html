@@ -1,1 +1,113 @@
-<h1></h1>
+<div class="d-flex w-100 mx-2">
+    <h1 class="m-auto">{{department?.departmentName}}</h1>
+    <div class="container-fluid d-flex justify-content-end">
+        <button type="button" class="btn btn-green px-4 me-2">
+            <h6 class="m-auto">Edit</h6>
+        </button>
+        <button type="button" class="btn btn-danger px-4 me-2">
+            <h6 class="m-auto">Delete</h6>
+        </button>
+    </div>
+</div>
+<hr>
+<div class="row mx-3">
+    <div class="col">
+        <ul #mainList class="list-group">
+            <li class="list-group-item">
+                <h6 class="m-0">ID</h6>
+                <p class="m-0">{{department?.departmentId}}</p>
+            </li>
+            <li class="list-group-item">
+                <h6 class="mb-0">Name</h6>
+                <p class="m-0">{{department?.departmentName}}</p>
+            </li>
+            @if (department?.locationStreetAddress) {
+                <li class="list-group-item">
+                    <h6 class="mb-0">Address</h6>
+                    <p class="m-0">{{department?.locationStreetAddress}}</p>
+                </li>
+            }
+            @if (department?.locationPostalCode) {
+                <li class="list-group-item">
+                    <h6 class="mb-0">Postal Code</h6>
+                    <p class="m-0">{{department?.locationPostalCode}}</p>
+                </li>
+            }
+            @if (department?.locationCity) {
+                <li class="list-group-item">
+                    <h6 class="mb-0">City</h6>
+                    <p class="m-0">{{department?.locationCity}}</p>
+                </li>
+            }
+            @if (department?.locationStateProvince) {
+                <li class="list-group-item">
+                    <h6 class="mb-0">State/Province</h6>
+                    <p class="m-0">{{department?.locationStateProvince}}</p>
+                </li>
+            }
+            @if (department?.countryName) {
+                <li class="list-group-item">
+                    <h6 class="mb-0">Country</h6>
+                    <p class="m-0">{{department?.countryName}}</p>
+                </li>
+            }
+            @if (department?.regionName) {
+                <li class="list-group-item">
+                    <h6 class="mb-0">Region</h6>
+                    <p class="m-0">{{department?.regionName}}</p>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="col">
+        <ul [style.max-height.px]="mainList.offsetHeight" class="list-group list-group-scroll">
+            <li class="list-group-item">
+                <p>Test</p>
+                <p>Test</p>
+            </li>
+            <li class="list-group-item">
+                <p>Test</p>
+                <p>Test</p>
+            </li>
+            <li class="list-group-item">
+                <p>Test</p>
+                <p>Test</p>
+            </li>
+            <li class="list-group-item">
+                <p>Test</p>
+                <p>Test</p>
+            </li>
+            <li class="list-group-item">
+                <p>Test</p>
+                <p>Test</p>
+            </li>
+            <li class="list-group-item">
+                <p>Test</p>
+                <p>Test</p>
+            </li>
+            <li class="list-group-item">
+                <p>Test</p>
+                <p>Test</p>
+            </li>
+            <li class="list-group-item">
+                <p>Test</p>
+                <p>Test</p>
+            </li>
+            <li class="list-group-item">
+                <p>Test</p>
+                <p>Test</p>
+            </li>
+            <li class="list-group-item">
+                <p>Test</p>
+                <p>Test</p>
+            </li>
+            <li class="list-group-item">
+                <p>Test</p>
+                <p>Test</p>
+            </li>
+        </ul>
+    </div>
+</div>
+<ul>
+
+</ul>

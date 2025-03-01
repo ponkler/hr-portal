@@ -16,7 +16,8 @@ import { AuthService } from './services/auth/auth.service';
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-  authService = inject(AuthService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   ngOnInit() {
     this.authService.checkLogin();

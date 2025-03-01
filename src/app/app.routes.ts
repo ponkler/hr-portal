@@ -4,6 +4,7 @@ import { DepartmenttableComponent } from './components/departmenttable/departmen
 import { LoginComponent } from './components/login/login.component';
 import { DepartmentdetailsComponent } from './components/departmentdetails/departmentdetails.component';
 import { EmployeetableComponent } from './components/employeetable/employeetable.component';
+import { JobtableComponent } from './components/jobtable/jobtable.component';
 
 export const routes: Routes = [
     {
@@ -25,5 +26,9 @@ export const routes: Routes = [
     {
         path: 'employee/list',
         component: EmployeetableComponent
+    },
+    {
+        path: 'job/list',
+        component: JobtableComponent
     }
 ];

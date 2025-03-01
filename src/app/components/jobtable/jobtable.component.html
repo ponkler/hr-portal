@@ -1,1 +1,181 @@
-<p>jobtable works!</p>
+<ng-template #add let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title ms-1" id="modal-basic-title">Add New Job</h4>
+        <button type="button" class="btn-close btn-close-white me-1" aria-label="Close"
+            (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        <div class="mb-3">
+            <div *ngIf="error" class="error mb-2 p-2">
+                {{ error }}
+            </div>
+            <form class="form" id="createForm" [formGroup]="createJobForm" (ngSubmit)="createJob()">
+                <div class="form-group mb-3">
+                    <label for="jobTitle" class="form-required">Title</label>
+                    <input type="text" class="form-control" id="jobTitle" placeholder="Enter a name..."
+                        formControlName="jobTitle" required>
+                    <div *ngIf="createTitle!.invalid && (createTitle!.dirty || createTitle!.touched)">
+                        <span *ngIf="createTitle!.hasError('required')" class="text-danger">Title is required</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="minSalary">Minimum Salary</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="minSalary" formControlName="minSalary">
+                            <span class="input-group-text">.00</span>
+                        </div>
+                        <div *ngIf="createMinSalary!.invalid && (createMinSalary!.dirty || createMinSalary!.touched)">
+                            <span *ngIf="createMinSalary!.hasError('max')" class="text-danger">Minimum salary cannot be
+                                greater than maximum salary</span>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <label for="maxSalary">Maximum Salary</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="maxSalary" formControlName="maxSalary">
+                            <span class="input-group-text">.00</span>
+                        </div>
+                        <div *ngIf="createMaxSalary!.invalid && (createMaxSalary!.dirty || createMaxSalary!.touched)">
+                            <span *ngIf="createMaxSalary!.hasError('min')" class="text-danger">Maximum salary cannot be
+                                less than minimum salary</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancel</button>
+        <button type="submit" form="createForm" class="btn btn-outline-green">Submit</button>
+    </div>
+</ng-template>
+
+<ng-template #edit let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title ms-1" id="modal-basic-title">Edit Job</h4>
+        <button type="button" class="btn-close btn-close-white me-1" aria-label="Close"
+            (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        <div class="mb-3">
+            <div *ngIf="error" class="error mb-2 p-2">
+                {{ error }}
+            </div>
+            <form class="form" id="updateForm" [formGroup]="updateJobForm" (ngSubmit)="updateJob(updateTarget?.jobId!)">
+                <div class="form-group">
+                    <label for="jobTitle" class="form-required">Title</label>
+                    <input type="text" class="form-control" id="jobTitle" placeholder="Enter a name..."
+                        formControlName="jobTitle" required>
+                    <div *ngIf="updateTitle!.invalid && (updateTitle!.dirty || updateTitle!.touched)">
+                        <span *ngIf="updateTitle!.hasError('required')" class="text-danger">Title is required</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="minSalary">Minimum Salary</label>
+                        <input type="number" class="form-control" id="minSalary" formControlName="minSalary">
+                        <div *ngIf="updateMinSalary!.invalid && (updateMinSalary!.dirty || updateMinSalary!.touched)">
+                            <span *ngIf="updateMinSalary!.hasError('max')" class="text-danger">Minimum salary cannot be
+                                greater than maximum salary</span>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <label for="maxSalary">maximum Salary</label>
+                        <input type="number" class="form-control" id="maxSalary" formControlName="maxSalary">
+                        <div *ngIf="updateMaxSalary!.invalid && (updateMaxSalary!.dirty || updateMaxSalary!.touched)">
+                            <span *ngIf="updateMaxSalary!.hasError('min')" class="text-danger">Maximum salary cannot be
+                                less than minimum salary</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancel</button>
+        <button type="submit" form="updateForm" class="btn btn-outline-green">Submit</button>
+    </div>
+</ng-template>
+
+<ng-template #delete let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title ms-1" id="modal-basic-title">Delete Job</h4>
+        <button type="button" class="btn-close btn-close-white me-1" aria-label="Close"
+            (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        <div class="mb-3">
+            <p>Are you sure you want to delete {{this.deleteTarget?.jobTitle}}?</p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancel</button>
+        <button type="button" class="btn btn-outline-danger"
+            (click)="deleteJob(this.deleteTarget?.jobId!)">Delete</button>
+    </div>
+</ng-template>
+
+<div class="d-flex w-100 mx-2 mb-2">
+    <h1 class="">Jobs</h1>
+    <div class="container-fluid d-flex justify-content-end">
+        <button type="button" class="btn btn-green px-4 me-2" (click)="openAdd(add)">
+            <h6 class="m-auto">Add New Job</h6>
+        </button>
+    </div>
+</div>
+
+<div class="container-fluid table-responsive">
+    <table class="table table-bordered table-sm">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Title</th>
+                <th scope="col">Salary Range</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (job of jobs; track job.jobId) {
+            <tr class="align-middle">
+                <th scope="row">{{job.jobId}}</th>
+                <td>{{job.jobTitle}}</td>
+                <td>{{job.minSalary | currency}} - {{job.maxSalary | currency}}</td>
+                <td>
+                    <div>
+                        <button type="button" class="btn btn-green m-1 p-2" (click)="redirectToDetails(job.jobId)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="d-flex" viewBox="0 0 16 16">
+                                <path
+                                    d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+                                <path
+                                    d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                            </svg>
+                        </button>
+                        <button type="button" class="btn btn-green m-1 p-2" (click)="openEdit(edit, job.jobId)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="d-flex" viewBox="0 0 16 16">
+                                <path
+                                    d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                <path fill-rule="evenodd"
+                                    d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+                            </svg>
+                        </button>
+                        <button type="button" class="btn btn-dark m-1 p-2" (click)="openDelete(delete, job.jobId)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="d-flex" viewBox="0 0 16 16">
+                                <path
+                                    d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+                                <path
+                                    d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+                            </svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>

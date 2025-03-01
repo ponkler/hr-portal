@@ -89,15 +89,15 @@ export class DepartmenttableComponent implements OnInit{
 
     const locationId = this.locations.find((location) => location.streetAddress == this.updateTarget?.locationStreetAddress)?.locationId!;
 
-    this.updateDepartmentForm.controls['name'].setValue(this.updateTarget?.departmentName!, { onlySelf: true });
-    this.updateDepartmentForm.controls['locationId'].setValue(locationId, { onlySelf: true });
+    this.updateDepartmentForm.get('name')?.setValue(this.updateTarget?.departmentName!, { onlySelf: true });
+    this.updateDepartmentForm.get('locationId')?.setValue(locationId, { onlySelf: true });
 
     this.modalService.open(content, { size: 'lg' });
   }
 
   openDelete(content: TemplateRef<any>, departmentId: number) {
-    this.modalService.open(content);
     this.deleteTarget = this.departments.find((department) => department.departmentId == departmentId);
+    this.modalService.open(content);
   }
 
   createDepartment() {
@@ -108,8 +108,6 @@ export class DepartmenttableComponent implements OnInit{
       departmentName: name,
       locationId: locationId
     };
-
-    console.log(typeof(department.locationId));
 
     if (this.createDepartmentForm.valid) {
       this.departmentService.createDepartment(department).subscribe({
